@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Games I've Seen — Knicks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Libre+Franklin:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0A1E3D;
+    --navy-mid: #12294F;
+    --navy-card: #163664;
+    --orange: #F58426;
+    --orange-deep: #D9691A;
+    --cream: #F3ECDC;
+    --cream-dim: #E7DEC8;
+    --win: #4F9E6E;
+    --win-dim: #274632;
+    --loss: #C4483C;
+    --loss-dim: #4A2420;
+    --ink: #0A1E3D;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Libre Franklin', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .display {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.02em;
+  }
+
+  /* ---------- Hero / scoreboard ---------- */
+
+  .hero {
+    background: radial-gradient(120% 140% at 15% -10%, #1B3E70 0%, var(--navy) 55%, #071528 100%);
+    color: var(--cream);
+    padding: 56px 24px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.025) 0px,
+      rgba(255,255,255,0.025) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+    pointer-events: none;
+  }
+
+  .hero-inner {
+    max-width: 980px;
+    margin: 0 auto;
+    position: relative;
+    text-align: center;
+  }
+
+  .hero-kicker {
+    color: var(--orange);
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0 0 6px;
+  }
+
+  .hero h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(32px, 6vw, 64px);
+    line-height: 0.95;
+    margin: 0 0 6px;
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+  }
+
+  .hero h1 span { color: var(--orange); }
+
+  .hero p.sub {
+    max-width: 46ch;
+    color: #C9D3E4;
+    font-size: 15.5px;
+    line-height: 1.55;
+    margin: 0 auto 34px;
+  }
+
+  .scoreboard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 1px solid rgba(243,236,220,0.18);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .scoreboard .cell {
+    padding: 18px 14px 16px;
+    border-right: 1px solid rgba(243,236,220,0.18);
+    background: rgba(255,255,255,0.02);
+    text-align: center;
+  }
+
+  .scoreboard .cell:last-child { border-right: none; }
+
+  .scoreboard .num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(30px, 5.5vw, 46px);
+    line-height: 1;
+    color: #FFFFFF;
+  }
+
+  .scoreboard .label {
+    font-size: 12px;
+    color: #FFFFFF;
+    margin-top: 6px;
+    line-height: 1.4;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    border: 1px solid rgba(243,236,220,0.14);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 12px;
+  }
+
+  .stats-row .cell {
+    padding: 14px 10px 12px;
+    border-right: 1px solid rgba(243,236,220,0.14);
+    background: rgba(255,255,255,0.015);
+    text-align: center;
+  }
+
+  .stats-row .cell:last-child { border-right: none; }
+
+  .stats-row .num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(22px, 3.6vw, 30px);
+    line-height: 1;
+    color: #FFFFFF;
+  }
+
+  .stats-row .label {
+    font-size: 10.5px;
+    color: #FFFFFF;
+    margin-top: 5px;
+    line-height: 1.3;
+  }
+
+  /* ---------- Card grid ---------- */
+
+  .section {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 44px 24px 80px;
+  }
+
+  .section-head {
+    margin-bottom: 22px;
+  }
+
+  .section-head h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30px;
+    margin: 0 0 4px;
+    letter-spacing: 0.01em;
+  }
+
+  .section-head p {
+    margin: 0;
+    color: #5B5140;
+    font-size: 14.5px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 22px;
+  }
+
+  .card-slot {
+    perspective: 1600px;
+    height: 340px;
+  }
+
+  .card {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.55s cubic-bezier(.4,.2,.2,1);
+  }
+
+  .card-slot.flipped .card {
+    transform: rotateY(180deg);
+  }
+
+  .face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* front */
+  .front {
+    background: linear-gradient(165deg, var(--navy-card) 0%, var(--navy) 78%);
+    color: var(--cream);
+    box-shadow: 0 10px 24px rgba(10,30,61,0.28);
+  }
+
+  .front .result-band {
+    padding: 10px 0;
+    text-align: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.12em;
+    color: #FFFFFF;
+  }
+
+  .front .result-band.win { background: var(--win); }
+  .front .result-band.loss { background: var(--loss); }
+
+  .front .matchup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 20px 18px 4px;
+    text-align: center;
+  }
+
+  .front .venue-line {
+    font-size: 11px;
+    color: var(--cream);
+    line-height: 1.3;
+  }
+
+  .front .date-line {
+    font-size: 13px;
+    color: var(--cream);
+    letter-spacing: 0.03em;
+  }
+
+  .front .team-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .front .team-logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    color: var(--cream);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.32);
+    border: 2px solid rgba(255,255,255,0.15);
+  }
+
+  .front .team-logo.knicks {
+    background: var(--orange);
+    color: var(--navy);
+  }
+
+  .front .at-label {
+    font-size: 11px;
+    color: var(--cream);
+    letter-spacing: 0.08em;
+  }
+
+  .front .team-names {
+    font-size: 13px;
+    color: var(--cream);
+  }
+
+  .front .score-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 14px;
+    font-family: 'Bebas Neue', sans-serif;
+  }
+
+  .front .score-row .knicks-score,
+  .front .score-row .opp-score {
+    font-size: 60px;
+    line-height: 1;
+  }
+
+  .front .score-row .knicks-score { color: var(--orange); }
+  .front .score-row .opp-score { color: var(--cream); }
+
+  .front .score-row .dash {
+    font-size: 26px;
+    color: var(--cream);
+  }
+
+  .front .comp {
+    padding: 4px 18px 0;
+    font-size: 12.5px;
+    color: var(--cream);
+  }
+
+  .front .card-footer {
+    padding: 10px 18px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    text-align: right;
+  }
+
+  .front .flip-hint {
+    font-size: 12px;
+    color: var(--orange);
+    white-space: nowrap;
+  }
+
+  /* back */
+  .back {
+    background: var(--cream);
+    color: var(--ink);
+    transform: rotateY(180deg);
+    border: 1px solid var(--cream-dim);
+    box-shadow: 0 10px 24px rgba(10,30,61,0.14);
+  }
+
+  .back .stub-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    background: var(--navy);
+    color: var(--cream);
+    font-size: 13px;
+  }
+
+  .back .stub-head .final {
+    color: var(--orange);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 15px;
+  }
+
+  .back .body {
+    padding: 14px 18px 10px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .back h4 {
+    font-size: 11.5px;
+    text-transform: none;
+    color: #8A7F63;
+    margin: 0 0 8px;
+    font-weight: 700;
+  }
+
+  .leaders {
+    list-style: none;
+    margin: 0 0 14px;
+    padding: 0;
+  }
+
+  .leaders li {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--cream-dim);
+    font-size: 13.5px;
+  }
+
+  .leaders li .name { font-weight: 600; }
+  .leaders li .stat { color: #6B6249; white-space: nowrap; }
+
+  .recap {
+    font-size: 13px;
+    line-height: 1.55;
+    color: #4A4433;
+    margin: 0;
+  }
+
+  .back .flip-hint {
+    padding: 10px 18px;
+    border-top: 1px solid var(--cream-dim);
+    font-size: 12px;
+    color: var(--orange-deep);
+    text-align: right;
+  }
+
+  footer {
+    text-align: center;
+    padding: 0 24px 50px;
+    color: #8A7F63;
+    font-size: 12.5px;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 560px) {
+    .scoreboard { grid-template-columns: repeat(2, 1fr); }
+    .scoreboard .cell:nth-child(2) { border-right: none; }
+    .scoreboard .cell:nth-child(3),
+    .scoreboard .cell:nth-child(4) { border-top: 1px solid rgba(243,236,220,0.18); }
+
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
+    .stats-row .cell:nth-child(3n) { border-right: none; }
+    .stats-row .cell:nth-child(n+4) { border-top: 1px solid rgba(243,236,220,0.14); }
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <p class="hero-kicker">MADISON SQUARE GARDEN &amp; ROAD TRIPS</p>
+    <h1>Games I've Seen <span>Live</span></h1>
+    <p class="sub">Every New York Knicks game I've watched from the seats, tracked from a 2021 rout in Orlando through Game 2 of the 2026 first round — part of the run that ended in a championship.</p>
+
+    <div class="scoreboard" id="scoreboard"></div>
+    <div class="stats-row" id="statsRow"></div>
+  </div>
+</header>
+
+<main class="section">
+  <div class="section-head">
+    <h2>The Games</h2>
+    <p>Tap a card to flip it and see who showed up that night.</p>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer>
+  Records reflect the eight games logged above, in chronological order from most recent to earliest. Scores and box-score notes are pulled from official game recaps.
+</footer>
+
+<script>
+// Fallback data (used if /api/games isn't reachable, e.g. opening this file directly).
+let games = [
+  {
+    date: "Apr 20, 2026",
+    opponent: "Atlanta Hawks",
+    oppAbbr: "ATL",
+    oppColor: "#E03A3E",
+    location: "Home — Madison Square Garden",
+    venue: "Madison Square Garden, New York, NY",
+    competition: "NBA Playoffs, East First Round — Game 2",
+    result: "L",
+    knicksScore: 106,
+    oppScore: 107,
+    box: { reb: 47, ast: 22, fgm: 39, fga: 87, tpm: 11, tpa: 34, ftm: 17, fta: 27 },
+    leaders: [
+      { name: "Jalen Brunson", stat: "29 pts" },
+      { name: "Karl-Anthony Towns", stat: "18 pts" },
+      { name: "Josh Hart", stat: "15 pts, 13 reb, 6 ast" }
+    ],
+    recap: "New York led by 12 after three quarters, but CJ McCollum scored 32 and put Atlanta ahead for good in the final two minutes. His two missed free throws with 5.6 seconds left gave the Knicks one last chance, but Mikal Bridges' jumper at the buzzer was off, and the series went back to Atlanta tied 1-1 — a game New York would avenge on the way to the title."
+  },
+  {
+    date: "Nov 13, 2024",
+    opponent: "Chicago Bulls",
+    oppAbbr: "CHI",
+    oppColor: "#CE1141",
+    location: "Home — Madison Square Garden",
+    venue: "Madison Square Garden, New York, NY",
+    competition: "Regular Season",
+    result: "L",
+    knicksScore: 123,
+    oppScore: 124,
+    box: { reb: 40, ast: 31, fgm: 48, fga: 94, tpm: 15, tpa: 37, ftm: 12, fta: 18 },
+    leaders: [
+      { name: "Karl-Anthony Towns", stat: "46 pts, 10 reb" },
+      { name: "Jalen Brunson", stat: "24 pts" },
+      { name: "Mikal Bridges", stat: "20 pts" }
+    ],
+    recap: "Towns' season-high 46 helped erase a 22-point deficit, and Brunson's bucket put the Knicks up with four seconds left — but Coby White drew a foul and hit all three free throws to steal it back for Chicago."
+  },
+  {
+    date: "Apr 9, 2023",
+    opponent: "Indiana Pacers",
+    oppAbbr: "IND",
+    oppColor: "#002D62",
+    location: "Home — Madison Square Garden",
+    venue: "Madison Square Garden, New York, NY",
+    competition: "Regular Season — Season Finale",
+    result: "L",
+    knicksScore: 136,
+    oppScore: 141,
+    box: { reb: 53, ast: 29, fgm: 52, fga: 108, tpm: 15, tpa: 40, ftm: 17, fta: 22 },
+    leaders: [
+      { name: "Obi Toppin", stat: "31 pts" },
+      { name: "Immanuel Quickley", stat: "30 pts" },
+      { name: "Mitchell Robinson", stat: "20 reb, 5 blk" }
+    ],
+    recap: "A meaningless finale for a Knicks team that had already locked its playoff seed turned into a track meet. Bennedict Mathurin's 26 led an Indiana team playing for lottery odds, RJ Barrett fouled out, and Josh Hart was ejected as New York closed the regular season on a loss."
+  },
+  {
+    date: "Oct 24, 2022",
+    opponent: "Orlando Magic",
+    oppAbbr: "ORL",
+    oppColor: "#0077C0",
+    location: "Home — Madison Square Garden",
+    venue: "Madison Square Garden, New York, NY",
+    competition: "Regular Season",
+    result: "W",
+    knicksScore: 115,
+    oppScore: 102,
+    box: { reb: 50, ast: 24, fgm: 43, fga: 93, tpm: 11, tpa: 37, ftm: 18, fta: 25 },
+    leaders: [
+      { name: "Julius Randle", stat: "25 pts, 12 reb" },
+      { name: "Jalen Brunson", stat: "21 pts" },
+      { name: "RJ Barrett", stat: "20 pts" }
+    ],
+    recap: "New York ran the young Magic off the floor early in the season, keeping No. 1 pick Paolo Banchero and Orlando winless behind a balanced night from Randle and Brunson."
+  },
+  {
+    date: "Mar 4, 2022",
+    opponent: "Phoenix Suns",
+    oppAbbr: "PHX",
+    oppColor: "#E56020",
+    location: "Away — Footprint Center, Phoenix",
+    venue: "Footprint Center, Phoenix, AZ",
+    competition: "Regular Season",
+    result: "L",
+    knicksScore: 114,
+    oppScore: 115,
+    box: { reb: 49, ast: 23, fgm: 40, fga: 86, tpm: 13, tpa: 29, ftm: 21, fta: 30 },
+    leaders: [
+      { name: "Julius Randle", stat: "25 pts (ejected, 3Q)" },
+      { name: "Mitchell Robinson", stat: "17 pts, 15 reb" },
+      { name: "Alec Burks", stat: "14 pts" }
+    ],
+    recap: "New York led by 14 after Randle was ejected for shoving Cam Johnson — who answered with a career-high 38, including a buzzer-beating banked three to steal it for the Suns."
+  },
+  {
+    date: "Jan 18, 2022",
+    opponent: "Minnesota Timberwolves",
+    oppAbbr: "MIN",
+    oppColor: "#236192",
+    location: "Home — Madison Square Garden",
+    venue: "Madison Square Garden, New York, NY",
+    competition: "Regular Season",
+    result: "L",
+    knicksScore: 110,
+    oppScore: 112,
+    box: { reb: 44, ast: 21, fgm: 37, fga: 80, tpm: 12, tpa: 38, ftm: 24, fta: 33 },
+    leaders: [
+      { name: "Julius Randle", stat: "21 pts, 9 reb, 9 ast, 4 blk" },
+      { name: "Evan Fournier", stat: "27 pts" },
+      { name: "RJ Barrett", stat: "17 pts" }
+    ],
+    recap: "The Knicks led for most of the fourth quarter, but Anthony Edwards and Karl-Anthony Towns pushed Minnesota back in front late, and a potential game-winning three from Alec Burks came up short."
+  },
+  {
+    date: "Oct 22, 2021",
+    opponent: "Orlando Magic",
+    oppAbbr: "ORL",
+    oppColor: "#0077C0",
+    location: "Away — Amway Center, Orlando",
+    venue: "Amway Center, Orlando, FL",
+    competition: "Regular Season",
+    result: "W",
+    knicksScore: 121,
+    oppScore: 96,
+    box: { reb: 38, ast: 34, fgm: 44, fga: 88, tpm: 24, tpa: 54, ftm: 9, fta: 17 },
+    leaders: [
+      { name: "Julius Randle", stat: "21 pts, 10 reb, 7 ast" },
+      { name: "Evan Fournier", stat: "18 pts" },
+      { name: "Immanuel Quickley", stat: "16 pts, 4 threes" },
+      { name: "Obi Toppin", stat: "13 pts" }
+    ],
+    recap: "New York opened 2-0 for the first time since 2012-13, burying a franchise-record 24 threes in a rout. Fournier, playing his first game back in Orlando after seven years with the Magic, got a warm ovation and knocked down four 3s of his own."
+  },
+  {
+    date: "Apr 11, 2021",
+    opponent: "Toronto Raptors",
+    oppAbbr: "TOR",
+    oppColor: "#753BBD",
+    location: "Home — Madison Square Garden",
+    venue: "Madison Square Garden, New York, NY",
+    competition: "Regular Season",
+    result: "W",
+    knicksScore: 102,
+    oppScore: 96,
+    box: { reb: 46, ast: 19, fgm: 35, fga: 88, tpm: 9, tpa: 35, ftm: 23, fta: 27 },
+    leaders: [
+      { name: "Julius Randle", stat: "26 pts, 8 reb, 5 ast" },
+      { name: "RJ Barrett", stat: "19 pts" },
+      { name: "Nerlens Noel", stat: "9 pts, 13 reb, 4 blk" }
+    ],
+    recap: "New York blew an 18-point lead before Barrett's corner three with 35 seconds left put the Knicks back in front for good, snapping a nine-game skid against Toronto."
+  }
+];
+
+function renderScoreboard() {
+  const wins = games.filter(g => g.result === "W").length;
+  const losses = games.filter(g => g.result === "L").length;
+  const winPct = Math.round((wins / games.length) * 100);
+  const winMargin = games.filter(g => g.result === "W")
+    .reduce((sum, g) => sum + (g.knicksScore - g.oppScore), 0);
+  const lossMargin = games.filter(g => g.result === "L")
+    .reduce((sum, g) => sum + (g.oppScore - g.knicksScore), 0);
+
+  const cells = [
+    { num: `${wins}-${losses}`, label: "Record in person", cls: "" },
+    { num: `${winPct}%`, label: "Win percentage live", cls: "orange" },
+    { num: `+${winMargin}`, label: "Combined margin in wins", cls: "win" },
+    { num: `-${lossMargin}`, label: "Combined margin in losses", cls: "loss" }
+  ];
+
+  document.getElementById("scoreboard").innerHTML = cells.map(c => `
+    <div class="cell">
+      <div class="num ${c.cls}">${c.num}</div>
+      <div class="label">${c.label}</div>
+    </div>
+  `).join("");
+}
+
+function renderGrid() {
+  const grid = document.getElementById("grid");
+  grid.innerHTML = games.map((g, i) => `
+    <div class="card-slot" data-index="${i}">
+      <div class="card">
+        <div class="face front">
+          <div class="result-band ${g.result === 'W' ? 'win' : 'loss'}">${g.result === 'W' ? 'WIN' : 'LOSS'}</div>
+          <div class="matchup">
+            <div class="date-line">${g.date}</div>
+            <div class="venue-line">${g.venue}</div>
+            <div class="team-row">
+              <div class="team-logo knicks">NYK</div>
+              <span class="at-label">${g.location.startsWith('Away') ? '@' : 'VS'}</span>
+              <div class="team-logo" style="background:${g.oppColor}">${g.oppAbbr}</div>
+            </div>
+            <div class="team-names">New York Knicks ${g.location.startsWith('Away') ? '@' : 'vs.'} ${g.opponent}</div>
+            <div class="score-row">
+              <span class="knicks-score">${g.knicksScore}</span>
+              <span class="dash">&ndash;</span>
+              <span class="opp-score">${g.oppScore}</span>
+            </div>
+          </div>
+          <div class="comp">${g.competition}</div>
+          <div class="card-footer">
+            <span class="flip-hint">Tap to flip &rarr;</span>
+          </div>
+        </div>
+        <div class="face back">
+          <div class="stub-head">
+            <span>${g.location}</span>
+            <span class="final">FINAL</span>
+          </div>
+          <div class="body">
+            <h4>Who showed up</h4>
+            <ul class="leaders">
+              ${g.leaders.map(l => `<li><span class="name">${l.name}</span><span class="stat">${l.stat}</span></li>`).join("")}
+            </ul>
+            <h4>The night</h4>
+            <p class="recap">${g.recap}</p>
+          </div>
+          <div class="flip-hint">&larr; Tap to flip back</div>
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+  grid.querySelectorAll(".card-slot").forEach(slot => {
+    slot.addEventListener("click", () => slot.classList.toggle("flipped"));
+  });
+}
+
+function renderStatsRow() {
+  const totals = games.reduce((acc, g) => {
+    acc.pts += g.knicksScore;
+    acc.reb += g.box.reb;
+    acc.ast += g.box.ast;
+    acc.fgm += g.box.fgm;
+    acc.fga += g.box.fga;
+    acc.tpm += g.box.tpm;
+    acc.tpa += g.box.tpa;
+    acc.ftm += g.box.ftm;
+    acc.fta += g.box.fta;
+    return acc;
+  }, { pts: 0, reb: 0, ast: 0, fgm: 0, fga: 0, tpm: 0, tpa: 0, ftm: 0, fta: 0 });
+
+  const n = games.length;
+  const cells = [
+    { num: (totals.pts / n).toFixed(1), label: "Points per game" },
+    { num: (totals.reb / n).toFixed(1), label: "Rebounds per game" },
+    { num: (totals.ast / n).toFixed(1), label: "Assists per game" },
+    { num: `${((totals.fgm / totals.fga) * 100).toFixed(1)}%`, label: "Field goal %" },
+    { num: `${((totals.tpm / totals.tpa) * 100).toFixed(1)}%`, label: "3-point %" },
+    { num: `${((totals.ftm / totals.fta) * 100).toFixed(1)}%`, label: "Free throw %" }
+  ];
+
+  document.getElementById("statsRow").innerHTML = cells.map(c => `
+    <div class="cell">
+      <div class="num">${c.num}</div>
+      <div class="label">${c.label}</div>
+    </div>
+  `).join("");
+}
+
+function renderAll() {
+  renderScoreboard();
+  renderStatsRow();
+  renderGrid();
+}
+
+renderAll();
+
+fetch("/api/games")
+  .then(res => { if (!res.ok) throw new Error("bad response"); return res.json(); })
+  .then(data => {
+    if (Array.isArray(data) && data.length) {
+      games = data;
+      renderAll();
+    }
+  })
+  .catch(() => {
+    // /api/games isn't reachable (e.g. this file opened directly, or the D1
+    // backend isn't deployed yet) — the embedded fallback data stays in place.
+  });
+</script>
+
+</body>
+</html>
