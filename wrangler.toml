@@ -5,4 +5,4 @@ pages_build_output_dir = "public"
 [[d1_databases]]
 binding = "DB"
 database_name = "knicks-tracker-db"
-database_id = "REPLACE_WITH_YOUR_DATABASE_ID"
+database_id = "1888e814-787b-41d1-bd14-cc1d8859b93a"
