@@ -416,7 +416,322 @@
     line-height: 1.6;
   }
 
+  /* ---------- Buttons ---------- */
+
+  .btn {
+    font-family: 'Libre Franklin', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border-radius: 4px;
+    padding: 10px 16px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    white-space: nowrap;
+    transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+  }
+
+  .btn:active { transform: translateY(1px); }
+
+  .btn-primary {
+    background: var(--orange);
+    color: var(--navy);
+  }
+
+  .btn-primary:hover { background: #FF9440; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--cream);
+    border-color: rgba(243,236,220,0.35);
+  }
+
+  .btn-ghost:hover { border-color: var(--cream); }
+
+  .btn-ghost.on-light {
+    color: var(--ink);
+    border-color: rgba(10,30,61,0.3);
+  }
+
+  .btn-ghost.on-light:hover { border-color: var(--ink); }
+
+  .btn[disabled] { opacity: 0.55; cursor: default; }
+
+  /* ---------- Upcoming banner ---------- */
+
+  .upcoming-wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 28px 24px 0;
+  }
+
+  .upcoming-banner {
+    background: linear-gradient(165deg, var(--navy-card) 0%, var(--navy) 80%);
+    color: var(--cream);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 24px rgba(10,30,61,0.22);
+  }
+
+  .upcoming-banner .banner-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 9px 20px;
+    background: var(--orange);
+    color: var(--navy);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 0.12em;
+  }
+
+  .upcoming-banner .banner-count {
+    font-family: 'Libre Franklin', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .upcoming-row {
+    display: grid;
+    grid-template-columns: minmax(150px, auto) 1fr auto;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 20px;
+  }
+
+  .upcoming-row + .upcoming-row { border-top: 1px solid rgba(243,236,220,0.14); }
+
+  .upcoming-when .up-date {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    line-height: 1;
+    color: #FFFFFF;
+    white-space: nowrap;
+  }
+
+  .upcoming-when .up-countdown {
+    margin-top: 5px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: var(--orange);
+  }
+
+  .upcoming-matchup {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .upcoming-matchup .badges {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto;
+  }
+
+  .upcoming-matchup .team-logo {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    letter-spacing: 0.02em;
+    color: var(--cream);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.32);
+    border: 2px solid rgba(255,255,255,0.15);
+  }
+
+  .upcoming-matchup .team-logo.knicks { background: var(--orange); color: var(--navy); }
+
+  .upcoming-matchup .at-label {
+    font-size: 11px;
+    color: var(--cream);
+    letter-spacing: 0.08em;
+  }
+
+  .upcoming-matchup .up-text { min-width: 0; }
+
+  .upcoming-matchup .up-names {
+    font-size: 15px;
+    font-weight: 700;
+    color: #FFFFFF;
+  }
+
+  .upcoming-matchup .up-meta {
+    margin-top: 3px;
+    font-size: 12.5px;
+    color: var(--cream);
+    line-height: 1.4;
+  }
+
+  .upcoming-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* ---------- Section head with Add button ---------- */
+
+  .section-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .empty-note {
+    grid-column: 1 / -1;
+    padding: 28px 0;
+    color: #5B5140;
+    font-size: 14.5px;
+  }
+
+  /* ---------- Add-game dialog ---------- */
+
+  dialog.game-dialog {
+    border: none;
+    padding: 0;
+    border-radius: 12px;
+    width: min(640px, calc(100vw - 24px));
+    max-height: calc(100vh - 24px);
+    background: var(--cream);
+    color: var(--ink);
+    box-shadow: 0 24px 60px rgba(7,21,40,0.45);
+    overflow: hidden;
+  }
+
+  dialog.game-dialog::backdrop { background: rgba(7,21,40,0.62); }
+
+  .game-dialog form {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 24px);
+  }
+
+  .dlg-head {
+    padding: 16px 22px;
+    background: var(--navy);
+    color: var(--cream);
+  }
+
+  .dlg-head h3 {
+    margin: 0;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.02em;
+    font-weight: 400;
+  }
+
+  .dlg-head p {
+    margin: 3px 0 0;
+    font-size: 13px;
+    color: var(--cream);
+  }
+
+  .dlg-body {
+    padding: 18px 22px 8px;
+    overflow-y: auto;
+  }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px 14px;
+  }
+
+  .field-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .field-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+  .field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .field.span-2 { grid-column: span 2; }
+  .field.span-all { grid-column: 1 / -1; }
+
+  .field label,
+  .group-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #5B5140;
+  }
+
+  .group-title { margin: 18px 0 8px; }
+
+  .field input,
+  .field select,
+  .field textarea {
+    font-family: 'Libre Franklin', sans-serif;
+    font-size: 14.5px;
+    color: var(--ink);
+    background: #FFFFFF;
+    border: 1px solid #CFC5AB;
+    border-radius: 4px;
+    padding: 9px 10px;
+    width: 100%;
+  }
+
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    outline: 2px solid var(--orange);
+    outline-offset: 0;
+    border-color: var(--orange);
+  }
+
+  .field textarea { resize: vertical; min-height: 64px; }
+
+  .pair { display: flex; align-items: center; gap: 6px; }
+  .pair span { color: #5B5140; font-weight: 700; }
+
+  .result-preview {
+    margin-top: 12px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #FFFFFF;
+    background: #8A7F63;
+  }
+
+  .result-preview.win { background: var(--win); }
+  .result-preview.loss { background: var(--loss); }
+
+  .dlg-error {
+    margin: 12px 22px 0;
+    padding: 9px 12px;
+    border-radius: 4px;
+    background: #F6D9D5;
+    color: #7A2218;
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+
+  .dlg-foot {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 14px 22px 18px;
+  }
+
+  .dlg-foot .btn-primary { background: var(--navy); color: var(--cream); }
+  .dlg-foot .btn-primary:hover { background: var(--navy-card); }
+
+  [hidden] { display: none !important; }
+
+  @media (max-width: 720px) {
+    .upcoming-row { grid-template-columns: 1fr; gap: 12px; }
+    .upcoming-actions { justify-content: flex-start; }
+    .upcoming-matchup { flex-wrap: wrap; }
+  }
+
   @media (max-width: 560px) {
+    .field-grid, .field-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+    .field-grid.cols-4 { grid-template-columns: 1fr 1fr; }
+    .field.span-2 { grid-column: 1 / -1; }
     .scoreboard { grid-template-columns: repeat(2, 1fr); }
     .scoreboard .cell:nth-child(2) { border-right: none; }
     .scoreboard .cell:nth-child(3),
@@ -441,17 +756,128 @@
   </div>
 </header>
 
+<section class="upcoming-wrap" id="upcomingWrap" hidden>
+  <div class="upcoming-banner">
+    <div class="banner-head">
+      <span>Upcoming</span>
+      <span class="banner-count" id="upcomingCount"></span>
+    </div>
+    <div id="upcomingList"></div>
+  </div>
+</section>
+
 <main class="section">
   <div class="section-head">
-    <h2>The Games</h2>
-    <p>Tap a card to flip it and see who showed up that night.</p>
+    <div>
+      <h2>The Games</h2>
+      <p>Tap a card to flip it and see who showed up that night.</p>
+    </div>
+    <button type="button" class="btn btn-primary" id="addGameBtn">+ Add game</button>
   </div>
   <div class="grid" id="grid"></div>
 </main>
 
-<footer>
-  Records reflect the eight games logged above, in chronological order from most recent to earliest. Scores and box-score notes are pulled from official game recaps.
-</footer>
+<footer id="footerNote"></footer>
+
+<dialog class="game-dialog" id="gameDialog">
+  <form id="gameForm" method="dialog" novalidate>
+    <div class="dlg-head">
+      <h3 id="dlgTitle">Add a game</h3>
+      <p id="dlgSub"></p>
+    </div>
+
+    <div class="dlg-body">
+      <div class="field-grid">
+        <div class="field">
+          <label for="fDate">Game date</label>
+          <input type="date" id="fDate" required>
+        </div>
+        <div class="field">
+          <label for="fHomeAway">Home or away</label>
+          <select id="fHomeAway">
+            <option value="home">Home</option>
+            <option value="away">Away</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="fOpponent">Opponent</label>
+          <select id="fOpponent" required></select>
+        </div>
+        <div class="field">
+          <label for="fCompetition">Competition</label>
+          <input type="text" id="fCompetition" list="competitionList" value="Regular Season" required>
+          <datalist id="competitionList">
+            <option value="Regular Season"></option>
+            <option value="NBA Cup"></option>
+            <option value="Preseason"></option>
+            <option value="NBA Playoffs, East First Round"></option>
+            <option value="NBA Playoffs, East Semifinals"></option>
+            <option value="NBA Playoffs, East Finals"></option>
+            <option value="NBA Finals"></option>
+          </datalist>
+        </div>
+        <div class="field span-2">
+          <label for="fVenue">Arena and city</label>
+          <input type="text" id="fVenue" required>
+        </div>
+      </div>
+
+      <div id="resultSection" hidden>
+        <div class="group-title">Final score</div>
+        <div class="field-grid">
+          <div class="field">
+            <label for="fKnicksScore">Knicks</label>
+            <input type="number" id="fKnicksScore" min="0" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label for="fOppScore" id="fOppScoreLabel">Opponent</label>
+            <input type="number" id="fOppScore" min="0" inputmode="numeric">
+          </div>
+        </div>
+        <div class="result-preview" id="resultPreview" hidden></div>
+
+        <div class="group-title">Knicks team totals from the box score</div>
+        <div class="field-grid cols-4">
+          <div class="field"><label for="fReb">Rebounds</label><input type="number" id="fReb" min="0" inputmode="numeric"></div>
+          <div class="field"><label for="fAst">Assists</label><input type="number" id="fAst" min="0" inputmode="numeric"></div>
+          <div class="field">
+            <label>Field goals (made / att)</label>
+            <div class="pair"><input type="number" id="fFgm" min="0" inputmode="numeric"><span>/</span><input type="number" id="fFga" min="0" inputmode="numeric"></div>
+          </div>
+          <div class="field">
+            <label>3-pointers (made / att)</label>
+            <div class="pair"><input type="number" id="fTpm" min="0" inputmode="numeric"><span>/</span><input type="number" id="fTpa" min="0" inputmode="numeric"></div>
+          </div>
+          <div class="field">
+            <label>Free throws (made / att)</label>
+            <div class="pair"><input type="number" id="fFtm" min="0" inputmode="numeric"><span>/</span><input type="number" id="fFta" min="0" inputmode="numeric"></div>
+          </div>
+        </div>
+
+        <div class="group-title">Who showed up (optional)</div>
+        <div class="field-grid" id="leaderRows"></div>
+
+        <div class="group-title">The night (optional)</div>
+        <div class="field">
+          <label for="fRecap">Recap</label>
+          <textarea id="fRecap" maxlength="2000" placeholder="A few lines about how the game went"></textarea>
+        </div>
+      </div>
+
+      <div class="group-title">Passcode</div>
+      <div class="field">
+        <input type="password" id="fPasscode" autocomplete="off" placeholder="Needed to save changes">
+      </div>
+    </div>
+
+    <div class="dlg-error" id="dlgError" hidden></div>
+
+    <div class="dlg-foot">
+      <button type="button" class="btn btn-ghost on-light" id="dlgCancel">Cancel</button>
+      <button type="submit" class="btn btn-primary" id="dlgSave">Save</button>
+    </div>
+  </form>
+</dialog>
 
 <script>
 // Fallback data (used if /api/games isn't reachable, e.g. opening this file directly).
@@ -643,37 +1069,39 @@ function renderGrid() {
         <div class="face front">
           <div class="result-band ${g.result === 'W' ? 'win' : 'loss'}">${g.result === 'W' ? 'WIN' : 'LOSS'}</div>
           <div class="matchup">
-            <div class="date-line">${g.date}</div>
-            <div class="venue-line">${g.venue}</div>
+            <div class="date-line">${esc(g.date)}</div>
+            <div class="venue-line">${esc(g.venue)}</div>
             <div class="team-row">
               <div class="team-logo knicks">NYK</div>
               <span class="at-label">${g.location.startsWith('Away') ? '@' : 'VS'}</span>
-              <div class="team-logo" style="background:${g.oppColor}">${g.oppAbbr}</div>
+              <div class="team-logo" style="background:${safeColor(g.oppColor)}">${esc(g.oppAbbr)}</div>
             </div>
-            <div class="team-names">New York Knicks ${g.location.startsWith('Away') ? '@' : 'vs.'} ${g.opponent}</div>
+            <div class="team-names">New York Knicks ${g.location.startsWith('Away') ? '@' : 'vs.'} ${esc(g.opponent)}</div>
             <div class="score-row">
               <span class="knicks-score">${g.knicksScore}</span>
               <span class="dash">&ndash;</span>
               <span class="opp-score">${g.oppScore}</span>
             </div>
           </div>
-          <div class="comp">${g.competition}</div>
+          <div class="comp">${esc(g.competition)}</div>
           <div class="card-footer">
             <span class="flip-hint">Tap to flip &rarr;</span>
           </div>
         </div>
         <div class="face back">
           <div class="stub-head">
-            <span>${g.location}</span>
+            <span>${esc(g.location)}</span>
             <span class="final">FINAL</span>
           </div>
           <div class="body">
             <h4>Who showed up</h4>
             <ul class="leaders">
-              ${g.leaders.map(l => `<li><span class="name">${l.name}</span><span class="stat">${l.stat}</span></li>`).join("")}
+              ${(g.leaders && g.leaders.length)
+                ? g.leaders.map(l => `<li><span class="name">${esc(l.name)}</span><span class="stat">${esc(l.stat)}</span></li>`).join("")
+                : `<li><span class="name">No top performers listed</span></li>`}
             </ul>
             <h4>The night</h4>
-            <p class="recap">${g.recap}</p>
+            <p class="recap">${g.recap ? esc(g.recap) : "No recap yet."}</p>
           </div>
           <div class="flip-hint">&larr; Tap to flip back</div>
         </div>
@@ -718,26 +1146,489 @@ function renderStatsRow() {
   `).join("");
 }
 
+/* ================= Helpers ================= */
+
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+function esc(value) {
+  return String(value === undefined || value === null ? "" : value).replace(/[&<>"']/g, c => (
+    { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]
+  ));
+}
+
+function safeColor(c) {
+  return /^#[0-9a-fA-F]{6}$/.test(c || "") ? c : "#4A5B7A";
+}
+
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function daysUntil(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  const [ty, tm, td] = todayISO().split("-").map(Number);
+  return Math.round((Date.UTC(y, m - 1, d) - Date.UTC(ty, tm - 1, td)) / 86400000);
+}
+
+function weekdayOf(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return WEEKDAYS[new Date(Date.UTC(y, m - 1, d)).getUTCDay()];
+}
+
+/* ================= Teams ================= */
+
+const HOME_VENUE = "Madison Square Garden, New York, NY";
+
+// Opponent list with badge colors and home arenas. Arena names change
+// with sponsorship deals, so the arena field in the form stays editable.
+const TEAMS = [
+  { name: "Atlanta Hawks",          abbr: "ATL", color: "#E03A3E", arena: "State Farm Arena, Atlanta, GA" },
+  { name: "Boston Celtics",         abbr: "BOS", color: "#007A33", arena: "TD Garden, Boston, MA" },
+  { name: "Brooklyn Nets",          abbr: "BKN", color: "#3A3A3A", arena: "Barclays Center, Brooklyn, NY" },
+  { name: "Charlotte Hornets",      abbr: "CHA", color: "#1D1160", arena: "Spectrum Center, Charlotte, NC" },
+  { name: "Chicago Bulls",          abbr: "CHI", color: "#CE1141", arena: "United Center, Chicago, IL" },
+  { name: "Cleveland Cavaliers",    abbr: "CLE", color: "#860038", arena: "Rocket Arena, Cleveland, OH" },
+  { name: "Dallas Mavericks",       abbr: "DAL", color: "#00538C", arena: "American Airlines Center, Dallas, TX" },
+  { name: "Denver Nuggets",         abbr: "DEN", color: "#4B6FA5", arena: "Ball Arena, Denver, CO" },
+  { name: "Detroit Pistons",        abbr: "DET", color: "#C8102E", arena: "Little Caesars Arena, Detroit, MI" },
+  { name: "Golden State Warriors",  abbr: "GSW", color: "#1D428A", arena: "Chase Center, San Francisco, CA" },
+  { name: "Houston Rockets",        abbr: "HOU", color: "#CE1141", arena: "Toyota Center, Houston, TX" },
+  { name: "Indiana Pacers",         abbr: "IND", color: "#002D62", arena: "Gainbridge Fieldhouse, Indianapolis, IN" },
+  { name: "Los Angeles Clippers",   abbr: "LAC", color: "#C8102E", arena: "Intuit Dome, Inglewood, CA" },
+  { name: "Los Angeles Lakers",     abbr: "LAL", color: "#552583", arena: "Crypto.com Arena, Los Angeles, CA" },
+  { name: "Memphis Grizzlies",      abbr: "MEM", color: "#5D76A9", arena: "FedExForum, Memphis, TN" },
+  { name: "Miami Heat",             abbr: "MIA", color: "#98002E", arena: "Kaseya Center, Miami, FL" },
+  { name: "Milwaukee Bucks",        abbr: "MIL", color: "#00471B", arena: "Fiserv Forum, Milwaukee, WI" },
+  { name: "Minnesota Timberwolves", abbr: "MIN", color: "#236192", arena: "Target Center, Minneapolis, MN" },
+  { name: "New Orleans Pelicans",   abbr: "NOP", color: "#85714D", arena: "Smoothie King Center, New Orleans, LA" },
+  { name: "Oklahoma City Thunder",  abbr: "OKC", color: "#007AC1", arena: "Paycom Center, Oklahoma City, OK" },
+  { name: "Orlando Magic",          abbr: "ORL", color: "#0077C0", arena: "Kia Center, Orlando, FL" },
+  { name: "Philadelphia 76ers",     abbr: "PHI", color: "#006BB6", arena: "Xfinity Mobile Arena, Philadelphia, PA" },
+  { name: "Phoenix Suns",           abbr: "PHX", color: "#E56020", arena: "Mortgage Matchup Center, Phoenix, AZ" },
+  { name: "Portland Trail Blazers", abbr: "POR", color: "#E03A3E", arena: "Moda Center, Portland, OR" },
+  { name: "Sacramento Kings",       abbr: "SAC", color: "#5A2D81", arena: "Golden 1 Center, Sacramento, CA" },
+  { name: "San Antonio Spurs",      abbr: "SAS", color: "#8A8D8F", arena: "Frost Bank Center, San Antonio, TX" },
+  { name: "Toronto Raptors",        abbr: "TOR", color: "#753BBD", arena: "Scotiabank Arena, Toronto, ON" },
+  { name: "Utah Jazz",              abbr: "UTA", color: "#6C4BA6", arena: "Delta Center, Salt Lake City, UT" },
+  { name: "Washington Wizards",     abbr: "WAS", color: "#E31837", arena: "Capital One Arena, Washington, DC" }
+];
+
+/* ================= Server calls ================= */
+
+const PASS_KEY = "knicksTrackerPasscode";
+
+function savedPasscode() {
+  try { return localStorage.getItem(PASS_KEY) || ""; } catch (_) { return ""; }
+}
+function rememberPasscode(p) {
+  try { localStorage.setItem(PASS_KEY, p); } catch (_) { /* storage unavailable */ }
+}
+function forgetPasscode() {
+  try { localStorage.removeItem(PASS_KEY); } catch (_) { /* storage unavailable */ }
+}
+
+async function api(method, path, body, passcode) {
+  const headers = { "Content-Type": "application/json" };
+  if (passcode) headers["X-Passcode"] = passcode;
+
+  let res;
+  try {
+    res = await fetch(path, { method, headers, body: body ? JSON.stringify(body) : undefined });
+  } catch (_) {
+    throw new Error("Couldn't reach the server. Saving only works on the live site.");
+  }
+
+  let data = null;
+  try { data = await res.json(); } catch (_) { /* no JSON body */ }
+
+  if (!res.ok) {
+    const err = new Error((data && data.error) || `Request failed (${res.status}).`);
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+
+let upcoming = [];
+
+async function loadData() {
+  try {
+    const g = await api("GET", "/api/games");
+    if (Array.isArray(g) && g.length) games = g;
+  } catch (_) {
+    // /api/games isn't reachable (e.g. this file opened directly, or the D1
+    // backend isn't deployed yet) — the embedded fallback data stays in place.
+  }
+  try {
+    const u = await api("GET", "/api/upcoming");
+    if (Array.isArray(u)) upcoming = u;
+  } catch (_) {
+    // Upcoming games need the upcoming_games table; without it the banner stays hidden.
+  }
+  renderAll();
+}
+
+/* ================= Upcoming banner ================= */
+
+function countdownText(iso) {
+  const n = daysUntil(iso);
+  if (n < 0) return "Played? Log the result";
+  if (n === 0) return "Today";
+  if (n === 1) return "Tomorrow";
+  return `In ${n} days`;
+}
+
+function renderUpcoming() {
+  const wrap = document.getElementById("upcomingWrap");
+  const list = document.getElementById("upcomingList");
+
+  if (!upcoming.length) {
+    wrap.hidden = true;
+    list.innerHTML = "";
+    return;
+  }
+
+  wrap.hidden = false;
+  document.getElementById("upcomingCount").textContent =
+    upcoming.length === 1 ? "1 game" : `${upcoming.length} games`;
+
+  list.innerHTML = upcoming.map(u => {
+    const away = u.location.startsWith("Away");
+    return `
+      <div class="upcoming-row" data-id="${esc(u.id)}">
+        <div class="upcoming-when">
+          <div class="up-date">${esc(u.date)}</div>
+          <div class="up-countdown">${esc(weekdayOf(u.sortDate))} &middot; ${esc(countdownText(u.sortDate))}</div>
+        </div>
+        <div class="upcoming-matchup">
+          <div class="badges">
+            <div class="team-logo knicks">NYK</div>
+            <span class="at-label">${away ? "@" : "VS"}</span>
+            <div class="team-logo" style="background:${safeColor(u.oppColor)}">${esc(u.oppAbbr)}</div>
+          </div>
+          <div class="up-text">
+            <div class="up-names">New York Knicks ${away ? "@" : "vs."} ${esc(u.opponent)}</div>
+            <div class="up-meta">${esc(u.venue)} &middot; ${esc(u.competition)}</div>
+          </div>
+        </div>
+        <div class="upcoming-actions">
+          <button type="button" class="btn btn-primary" data-action="complete" data-id="${esc(u.id)}">Log result</button>
+          <button type="button" class="btn btn-ghost" data-action="remove" data-id="${esc(u.id)}">Remove</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+async function removeUpcomingGame(id) {
+  const u = upcoming.find(x => x.id === id);
+  if (!u) return;
+  if (!confirm(`Remove the ${u.opponent} game on ${u.date} from the upcoming list?`)) return;
+
+  let pass = savedPasscode();
+  if (!pass) {
+    pass = (prompt("Enter your passcode to remove this game:") || "").trim();
+    if (!pass) return;
+  }
+
+  try {
+    await api("DELETE", `/api/upcoming/${id}`, null, pass);
+    rememberPasscode(pass);
+    await loadData();
+  } catch (err) {
+    if (err.status === 401) forgetPasscode();
+    alert(err.message);
+  }
+}
+
+/* ================= Add / log-result dialog ================= */
+
+const dlg = document.getElementById("gameDialog");
+const form = document.getElementById("gameForm");
+const el = id => document.getElementById(id);
+
+let dialogMode = "new";        // "new" or "complete"
+let editingUpcoming = null;    // the upcoming game being turned into a played game
+let venueEdited = false;       // true once the arena text was typed by hand
+
+function populateOpponents() {
+  el("fOpponent").innerHTML =
+    `<option value="">Choose a team</option>` +
+    TEAMS.map(t => `<option value="${t.abbr}">${esc(t.name)}</option>`).join("");
+}
+
+function buildLeaderRows() {
+  el("leaderRows").innerHTML = [1, 2, 3].map(i => `
+    <div class="field"><input type="text" class="ldr-name" maxlength="60" placeholder="Player ${i}" aria-label="Top performer ${i} name"></div>
+    <div class="field"><input type="text" class="ldr-stat" maxlength="80" placeholder="e.g. 28 pts, 7 ast" aria-label="Top performer ${i} stat line"></div>
+  `).join("");
+}
+
+function selectedTeam() {
+  return TEAMS.find(t => t.abbr === el("fOpponent").value) || null;
+}
+
+function syncVenue() {
+  if (venueEdited) return;
+  const home = el("fHomeAway").value === "home";
+  const team = selectedTeam();
+  el("fVenue").value = home ? HOME_VENUE : (team ? team.arena : "");
+}
+
+function needsResult() {
+  if (dialogMode === "complete") return true;
+  const date = el("fDate").value;
+  return Boolean(date) && date < todayISO();
+}
+
+function syncDialogState() {
+  const showResult = needsResult();
+  el("resultSection").hidden = !showResult;
+
+  const team = selectedTeam();
+  el("fOppScoreLabel").textContent = team ? team.name : "Opponent";
+
+  let label = "Add upcoming game";
+  if (dialogMode === "complete") label = "Save result";
+  else if (showResult) label = "Save game";
+  el("dlgSave").textContent = label;
+
+  syncPreview();
+}
+
+function syncPreview() {
+  const box = el("resultPreview");
+  const k = el("fKnicksScore").value;
+  const o = el("fOppScore").value;
+  const kn = Number(k);
+  const on = Number(o);
+
+  if (k === "" || o === "" || !Number.isInteger(kn) || !Number.isInteger(on) || kn === on) {
+    box.hidden = true;
+    return;
+  }
+  const win = kn > on;
+  box.hidden = false;
+  box.className = "result-preview " + (win ? "win" : "loss");
+  box.textContent = `${win ? "Win" : "Loss"}, ${kn}–${on} (${win ? "+" : "−"}${Math.abs(kn - on)})`;
+}
+
+function showDialogError(message) {
+  const box = el("dlgError");
+  box.textContent = message;
+  box.hidden = false;
+}
+
+function clearDialogError() {
+  el("dlgError").hidden = true;
+  el("dlgError").textContent = "";
+}
+
+function openDialog(mode, up) {
+  dialogMode = mode;
+  editingUpcoming = up || null;
+  clearDialogError();
+
+  // Blank slate
+  form.querySelectorAll("input[type=number], input[type=text], textarea").forEach(i => { i.value = ""; });
+  buildLeaderRows();
+  el("fPasscode").value = savedPasscode();
+  el("fCompetition").value = "Regular Season";
+  el("fDate").value = "";
+  el("fHomeAway").value = "home";
+  el("fOpponent").value = "";
+  venueEdited = false;
+
+  if (mode === "complete" && up) {
+    el("dlgTitle").textContent = "Log the result";
+    el("dlgSub").textContent = `${up.opponent} · ${up.date}. Enter the final score and box score to move it into The Games.`;
+    el("fDate").value = up.sortDate;
+    el("fHomeAway").value = up.location.startsWith("Away") ? "away" : "home";
+    const team = TEAMS.find(t => t.abbr === up.oppAbbr);
+    el("fOpponent").value = team ? team.abbr : "";
+    el("fCompetition").value = up.competition;
+    el("fVenue").value = up.venue;
+    venueEdited = true;
+  } else {
+    el("dlgTitle").textContent = "Add a game";
+    el("dlgSub").textContent = "A game dated today or later goes into the Upcoming banner. A game that's already been played needs its result.";
+    syncVenue();
+  }
+
+  syncDialogState();
+
+  if (typeof dlg.showModal === "function") dlg.showModal();
+  else dlg.setAttribute("open", "");
+
+  (mode === "complete" ? el("fKnicksScore") : el("fDate")).focus();
+}
+
+function closeDialog() {
+  if (typeof dlg.close === "function") dlg.close();
+  else dlg.removeAttribute("open");
+}
+
+function wholeNumber(id, label) {
+  const raw = el(id).value;
+  const n = Number(raw);
+  if (raw === "" || !Number.isInteger(n) || n < 0) {
+    throw new Error(`${label} needs a whole number of 0 or more.`);
+  }
+  return n;
+}
+
+function readForm() {
+  const sortDate = el("fDate").value;
+  if (!sortDate) throw new Error("Pick the game date.");
+
+  const team = selectedTeam();
+  if (!team) throw new Error("Choose the opponent.");
+
+  const competition = el("fCompetition").value.trim();
+  if (!competition) throw new Error("Add the competition, like Regular Season.");
+
+  const venue = el("fVenue").value.trim();
+  if (!venue) throw new Error("Add the arena and city.");
+
+  const passcode = el("fPasscode").value.trim();
+  if (!passcode) throw new Error("Enter your passcode to save.");
+
+  const isHome = el("fHomeAway").value === "home";
+  const arenaName = venue.split(",")[0].trim();
+
+  const matchup = {
+    sortDate,
+    opponent: team.name,
+    oppAbbr: team.abbr,
+    oppColor: team.color,
+    location: `${isHome ? "Home" : "Away"} — ${arenaName}`,
+    venue,
+    competition
+  };
+
+  if (!needsResult()) return { kind: "upcoming", passcode, body: matchup };
+
+  const knicksScore = wholeNumber("fKnicksScore", "The Knicks score");
+  const oppScore = wholeNumber("fOppScore", `The ${team.name} score`);
+  if (knicksScore === oppScore) throw new Error("NBA games can't end tied. Check the scores.");
+
+  const box = {
+    reb: wholeNumber("fReb", "Rebounds"),
+    ast: wholeNumber("fAst", "Assists"),
+    fgm: wholeNumber("fFgm", "Field goals made"),
+    fga: wholeNumber("fFga", "Field goals attempted"),
+    tpm: wholeNumber("fTpm", "3-pointers made"),
+    tpa: wholeNumber("fTpa", "3-pointers attempted"),
+    ftm: wholeNumber("fFtm", "Free throws made"),
+    fta: wholeNumber("fFta", "Free throws attempted")
+  };
+  if (box.fgm > box.fga) throw new Error("Field goals made can't be more than attempted.");
+  if (box.tpm > box.tpa) throw new Error("3-pointers made can't be more than attempted.");
+  if (box.ftm > box.fta) throw new Error("Free throws made can't be more than attempted.");
+  if (box.tpm > box.fgm) throw new Error("3-pointers made can't be more than field goals made.");
+
+  const names = [...form.querySelectorAll(".ldr-name")];
+  const stats = [...form.querySelectorAll(".ldr-stat")];
+  const leaders = names
+    .map((n, i) => ({ name: n.value.trim(), stat: (stats[i] ? stats[i].value : "").trim() }))
+    .filter(l => l.name);
+
+  const body = {
+    ...matchup,
+    knicksScore,
+    oppScore,
+    box,
+    leaders,
+    recap: el("fRecap").value.trim()
+  };
+  if (dialogMode === "complete" && editingUpcoming) body.fromUpcomingId = editingUpcoming.id;
+
+  return { kind: "game", passcode, body };
+}
+
+async function submitDialog(event) {
+  event.preventDefault();
+  clearDialogError();
+
+  let parsed;
+  try {
+    parsed = readForm();
+  } catch (err) {
+    showDialogError(err.message);
+    return;
+  }
+
+  const saveBtn = el("dlgSave");
+  const original = saveBtn.textContent;
+  saveBtn.disabled = true;
+  saveBtn.textContent = "Saving…";
+
+  try {
+    const path = parsed.kind === "upcoming" ? "/api/upcoming" : "/api/games";
+    await api("POST", path, parsed.body, parsed.passcode);
+    rememberPasscode(parsed.passcode);
+    closeDialog();
+    await loadData();
+  } catch (err) {
+    if (err.status === 401) forgetPasscode();
+    showDialogError(err.message);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = original;
+    syncDialogState();
+  }
+}
+
+/* ================= Wiring ================= */
+
+function renderFooter() {
+  const n = games.length;
+  el("footerNote").textContent =
+    `Records reflect the ${n} game${n === 1 ? "" : "s"} logged above, in chronological order from most recent to earliest. ` +
+    `Scores and box-score notes are pulled from official game recaps.`;
+}
+
 function renderAll() {
   renderScoreboard();
   renderStatsRow();
+  renderUpcoming();
   renderGrid();
+  renderFooter();
 }
 
-renderAll();
+populateOpponents();
 
-fetch("/api/games")
-  .then(res => { if (!res.ok) throw new Error("bad response"); return res.json(); })
-  .then(data => {
-    if (Array.isArray(data) && data.length) {
-      games = data;
-      renderAll();
-    }
-  })
-  .catch(() => {
-    // /api/games isn't reachable (e.g. this file opened directly, or the D1
-    // backend isn't deployed yet) — the embedded fallback data stays in place.
-  });
+el("addGameBtn").addEventListener("click", () => openDialog("new"));
+el("dlgCancel").addEventListener("click", closeDialog);
+form.addEventListener("submit", submitDialog);
+
+form.addEventListener("input", clearDialogError);
+form.addEventListener("change", clearDialogError);
+
+el("fDate").addEventListener("input", syncDialogState);
+el("fDate").addEventListener("change", syncDialogState);
+el("fOpponent").addEventListener("change", () => { syncVenue(); syncDialogState(); });
+el("fHomeAway").addEventListener("change", syncVenue);
+el("fVenue").addEventListener("input", () => { venueEdited = true; });
+el("fKnicksScore").addEventListener("input", syncPreview);
+el("fOppScore").addEventListener("input", syncPreview);
+
+el("upcomingList").addEventListener("click", event => {
+  const btn = event.target.closest("[data-action]");
+  if (!btn) return;
+  const id = Number(btn.dataset.id);
+  if (btn.dataset.action === "complete") {
+    const u = upcoming.find(x => x.id === id);
+    if (u) openDialog("complete", u);
+  } else if (btn.dataset.action === "remove") {
+    removeUpcomingGame(id);
+  }
+});
+
+renderAll();
+loadData();
 </script>
 
 </body>
