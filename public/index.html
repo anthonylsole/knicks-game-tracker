@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Games I've Seen — Knicks</title>
+<title>Knicks Game Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Libre+Franklin:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -80,7 +80,7 @@
     font-family: 'Bebas Neue', sans-serif;
     font-size: clamp(32px, 6vw, 64px);
     line-height: 0.95;
-    margin: 0 0 6px;
+    margin: 0 0 34px;
     letter-spacing: 0.01em;
     white-space: nowrap;
   }
@@ -403,8 +403,25 @@
     border-top: 1px solid var(--cream-dim);
     font-size: 12px;
     color: var(--orange-deep);
-    text-align: right;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
   }
+
+  .box-btn {
+    font: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    color: #FFFFFF;
+    background: var(--navy);
+    border: 0;
+    border-radius: 6px;
+    padding: 6px 12px;
+    cursor: pointer;
+  }
+  .box-btn:hover { background: var(--navy-card); }
+  .box-btn:disabled { opacity: 0.6; cursor: default; }
 
   footer {
     text-align: center;
@@ -511,6 +528,19 @@
     white-space: nowrap;
   }
 
+  .sync-link {
+    font-family: 'Libre Franklin', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--orange);
+    text-decoration: underline;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .sync-link:hover { color: #FFFFFF; }
+  .sync-link.busy { opacity: 0.6; pointer-events: none; text-decoration: none; }
+
   .upcoming-when .up-countdown {
     margin-top: 5px;
     font-size: 12.5px;
@@ -591,6 +621,81 @@
     color: #5B5140;
     font-size: 14.5px;
   }
+
+  /* ---------- Box score dialog ---------- */
+
+  dialog.box-dialog {
+    border: none;
+    padding: 0;
+    border-radius: 12px;
+    width: min(920px, calc(100vw - 24px));
+    max-height: calc(100vh - 24px);
+    background: var(--cream);
+    color: var(--ink);
+    box-shadow: 0 24px 60px rgba(7,21,40,0.45);
+    overflow: hidden;
+  }
+  dialog.box-dialog::backdrop { background: rgba(7,21,40,0.62); }
+  dialog.box-dialog[open] { display: flex; flex-direction: column; }
+
+  .box-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    background: var(--navy);
+    color: var(--cream);
+  }
+  .box-head h3 {
+    margin: 0;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    letter-spacing: 0.02em;
+    font-weight: 400;
+  }
+  .box-head p { margin: 2px 0 0; font-size: 12.5px; color: #C9D3E4; }
+
+  .box-body { padding: 8px 20px 20px; overflow-y: auto; }
+  .box-team h4 {
+    margin: 18px 0 8px;
+    font-size: 14px;
+    color: var(--navy);
+  }
+  .box-scroll { overflow-x: auto; border: 1px solid var(--cream-dim); border-radius: 8px; }
+  table.box {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+  table.box th, table.box td {
+    padding: 7px 10px;
+    text-align: right;
+    border-bottom: 1px solid var(--cream-dim);
+  }
+  table.box th {
+    font-size: 11px;
+    color: #6B6249;
+    background: #EFE6D0;
+    position: sticky;
+    top: 0;
+  }
+  table.box th:first-child, table.box td:first-child {
+    text-align: left;
+    position: sticky;
+    left: 0;
+    background: var(--cream);
+    font-weight: 600;
+  }
+  table.box th:first-child { background: #EFE6D0; }
+  table.box .pos { color: #8A7F63; font-weight: 400; font-size: 11px; margin-left: 4px; }
+  table.box tr.bench-first td { border-top: 2px solid var(--cream-dim); }
+  table.box tr.dnp td { color: #8A7F63; font-weight: 400; text-align: left; }
+  table.box tr.totals td { font-weight: 800; background: #EFE6D0; border-bottom: 0; }
+  table.box td.pts { font-weight: 800; }
+  .box-note { font-size: 12px; color: #8A7F63; margin: 12px 0 0; }
 
   /* ---------- Add-game dialog ---------- */
 
@@ -747,9 +852,7 @@
 
 <header class="hero">
   <div class="hero-inner">
-    <p class="hero-kicker">MADISON SQUARE GARDEN &amp; ROAD TRIPS</p>
-    <h1>Games I've Seen <span>Live</span></h1>
-    <p class="sub">Every New York Knicks game I've watched from the seats, tracked from a 2021 rout in Orlando through Game 2 of the 2026 first round — part of the run that ended in a championship.</p>
+    <h1>KNICKS <span>GAME TRACKER</span></h1>
 
     <div class="scoreboard" id="scoreboard"></div>
     <div class="stats-row" id="statsRow"></div>
@@ -778,6 +881,17 @@
 </main>
 
 <footer id="footerNote"></footer>
+
+<dialog class="box-dialog" id="boxDialog">
+  <div class="box-head">
+    <div>
+      <h3 id="boxTitle">Box score</h3>
+      <p id="boxSub"></p>
+    </div>
+    <button type="button" class="btn btn-ghost" id="boxClose">Close</button>
+  </div>
+  <div class="box-body" id="boxBody"></div>
+</dialog>
 
 <dialog class="game-dialog" id="gameDialog">
   <form id="gameForm" method="dialog" novalidate>
@@ -1099,16 +1213,81 @@ function renderGrid() {
             <h4>The night</h4>
             <p class="recap">${g.recap ? esc(g.recap) : "No recap yet."}</p>
           </div>
-          <div class="flip-hint">&larr; Tap to flip back</div>
+          <div class="flip-hint">
+            ${g.id ? `<button type="button" class="box-btn" data-box="${i}">Box score</button>` : "<span></span>"}
+            <span>&larr; Tap to flip back</span>
+          </div>
         </div>
       </div>
     </div>
   `).join("");
 
   grid.querySelectorAll(".card-slot").forEach(slot => {
-    slot.addEventListener("click", () => slot.classList.toggle("flipped"));
+    slot.addEventListener("click", event => {
+      const btn = event.target.closest("[data-box]");
+      if (btn) {
+        event.stopPropagation();
+        showBoxScore(Number(btn.dataset.box), btn);
+        return;
+      }
+      slot.classList.toggle("flipped");
+    });
   });
 }
+
+/* ================= Box score ================= */
+
+function boxTable(team, columns) {
+  const head = `<tr><th>Player</th>${columns.map(c => `<th>${esc(c)}</th>`).join("")}</tr>`;
+  let seenBench = false;
+  const rows = team.players.map(p => {
+    const bench = !p.starter && !seenBench;
+    if (!p.starter) seenBench = true;
+    const name = `${esc(p.name)}${p.pos ? `<span class="pos">${esc(p.pos)}</span>` : ""}`;
+    if (p.dnp) {
+      return `<tr class="dnp${bench ? " bench-first" : ""}"><td>${name}</td><td colspan="${columns.length}">DNP${p.reason ? ` &ndash; ${esc(p.reason)}` : ""}</td></tr>`;
+    }
+    return `<tr class="${bench ? "bench-first" : ""}"><td>${name}</td>${p.s.map((v, i) =>
+      `<td class="${columns[i] === "PTS" ? "pts" : ""}">${esc(v)}</td>`).join("")}</tr>`;
+  }).join("");
+  const totals = `<tr class="totals"><td>Team</td>${team.totals.map(v => `<td>${esc(v)}</td>`).join("")}</tr>`;
+  return `<div class="box-team"><h4>${esc(team.name)}</h4><div class="box-scroll"><table class="box"><thead>${head}</thead><tbody>${rows}${totals}</tbody></table></div></div>`;
+}
+
+function openBoxDialog(g) {
+  document.getElementById("boxTitle").textContent = `Knicks ${g.location.startsWith("Away") ? "@" : "vs."} ${g.opponent}`;
+  document.getElementById("boxSub").textContent = `${g.date} · Final ${g.knicksScore}-${g.oppScore}`;
+  document.getElementById("boxBody").innerHTML =
+    g.boxScore.teams.map(t => boxTable(t, g.boxScore.columns)).join("") +
+    `<p class="box-note">MIN minutes, FG field goals, 3PT threes, FT free throws, TO turnovers, PF fouls, +/- point margin while on the floor. Source: ESPN.</p>`;
+  const dlg = document.getElementById("boxDialog");
+  if (!dlg.open) dlg.showModal();
+  document.getElementById("boxBody").scrollTop = 0;
+}
+
+async function showBoxScore(index, btn) {
+  const g = games[index];
+  if (!g) return;
+  if (g.boxScore) { openBoxDialog(g); return; }
+
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Loading...";
+  try {
+    g.boxScore = await api("POST", `/api/games/${g.id}/boxscore`);
+    openBoxDialog(g);
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+}
+
+document.getElementById("boxClose").addEventListener("click", () => document.getElementById("boxDialog").close());
+document.getElementById("boxDialog").addEventListener("click", event => {
+  if (event.target === document.getElementById("boxDialog")) document.getElementById("boxDialog").close();
+});
 
 function renderStatsRow() {
   const totals = games.reduce((acc, g) => {
@@ -1282,7 +1461,7 @@ function renderUpcoming() {
     return `
       <div class="upcoming-row" data-id="${esc(u.id)}">
         <div class="upcoming-when">
-          <div class="up-date">${esc(u.date)}</div>
+          <div class="up-date">${esc(u.date)} <a href="#" class="sync-link" data-action="sync" data-id="${esc(u.id)}" title="Pull the final score and box score and make a card">SYNC</a></div>
           <div class="up-countdown">${esc(weekdayOf(u.sortDate))} &middot; ${esc(countdownText(u.sortDate))}</div>
         </div>
         <div class="upcoming-matchup">
@@ -1303,6 +1482,20 @@ function renderUpcoming() {
       </div>
     `;
   }).join("");
+}
+
+async function syncGame(id, link) {
+  if (link.classList.contains("busy")) return;
+  link.classList.add("busy");
+  link.textContent = "SYNCING...";
+  try {
+    await api("POST", `/api/upcoming/${id}/sync`);
+    await loadData();
+  } catch (err) {
+    alert(err.message);
+    link.classList.remove("busy");
+    link.textContent = "SYNC";
+  }
 }
 
 async function removeUpcomingGame(id) {
@@ -1588,6 +1781,11 @@ el("upcomingList").addEventListener("click", event => {
   const btn = event.target.closest("[data-action]");
   if (!btn) return;
   const id = Number(btn.dataset.id);
+  if (btn.dataset.action === "sync") {
+    event.preventDefault();
+    syncGame(Number(btn.dataset.id), btn);
+    return;
+  }
   if (btn.dataset.action === "complete") {
     const u = upcoming.find(x => x.id === id);
     if (u) openDialog("complete", u);
