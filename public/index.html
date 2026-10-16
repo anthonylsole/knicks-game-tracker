@@ -864,10 +864,6 @@
         </div>
       </div>
 
-      <div class="group-title">Passcode</div>
-      <div class="field">
-        <input type="password" id="fPasscode" autocomplete="off" placeholder="Needed to save changes">
-      </div>
     </div>
 
     <div class="dlg-error" id="dlgError" hidden></div>
@@ -1217,25 +1213,14 @@ const TEAMS = [
 
 /* ================= Server calls ================= */
 
-const PASS_KEY = "knicksTrackerPasscode";
-
-function savedPasscode() {
-  try { return localStorage.getItem(PASS_KEY) || ""; } catch (_) { return ""; }
-}
-function rememberPasscode(p) {
-  try { localStorage.setItem(PASS_KEY, p); } catch (_) { /* storage unavailable */ }
-}
-function forgetPasscode() {
-  try { localStorage.removeItem(PASS_KEY); } catch (_) { /* storage unavailable */ }
-}
-
-async function api(method, path, body, passcode) {
-  const headers = { "Content-Type": "application/json" };
-  if (passcode) headers["X-Passcode"] = passcode;
-
+async function api(method, path, body) {
   let res;
   try {
-    res = await fetch(path, { method, headers, body: body ? JSON.stringify(body) : undefined });
+    res = await fetch(path, {
+      method,
+      headers: body ? { "Content-Type": "application/json" } : undefined,
+      body: body ? JSON.stringify(body) : undefined
+    });
   } catch (_) {
     throw new Error("Couldn't reach the server. Saving only works on the live site.");
   }
@@ -1244,9 +1229,7 @@ async function api(method, path, body, passcode) {
   try { data = await res.json(); } catch (_) { /* no JSON body */ }
 
   if (!res.ok) {
-    const err = new Error((data && data.error) || `Request failed (${res.status}).`);
-    err.status = res.status;
-    throw err;
+    throw new Error((data && data.error) || `Request failed (${res.status}).`);
   }
   return data;
 }
@@ -1327,18 +1310,10 @@ async function removeUpcomingGame(id) {
   if (!u) return;
   if (!confirm(`Remove the ${u.opponent} game on ${u.date} from the upcoming list?`)) return;
 
-  let pass = savedPasscode();
-  if (!pass) {
-    pass = (prompt("Enter your passcode to remove this game:") || "").trim();
-    if (!pass) return;
-  }
-
   try {
-    await api("DELETE", `/api/upcoming/${id}`, null, pass);
-    rememberPasscode(pass);
+    await api("DELETE", `/api/upcoming/${id}`);
     await loadData();
   } catch (err) {
-    if (err.status === 401) forgetPasscode();
     alert(err.message);
   }
 }
@@ -1434,7 +1409,6 @@ function openDialog(mode, up) {
   // Blank slate
   form.querySelectorAll("input[type=number], input[type=text], textarea").forEach(i => { i.value = ""; });
   buildLeaderRows();
-  el("fPasscode").value = savedPasscode();
   el("fCompetition").value = "Regular Season";
   el("fDate").value = "";
   el("fHomeAway").value = "home";
@@ -1492,9 +1466,6 @@ function readForm() {
   const venue = el("fVenue").value.trim();
   if (!venue) throw new Error("Add the arena and city.");
 
-  const passcode = el("fPasscode").value.trim();
-  if (!passcode) throw new Error("Enter your passcode to save.");
-
   const isHome = el("fHomeAway").value === "home";
   const arenaName = venue.split(",")[0].trim();
 
@@ -1508,7 +1479,7 @@ function readForm() {
     competition
   };
 
-  if (!needsResult()) return { kind: "upcoming", passcode, body: matchup };
+  if (!needsResult()) return { kind: "upcoming", body: matchup };
 
   const knicksScore = wholeNumber("fKnicksScore", "The Knicks score");
   const oppScore = wholeNumber("fOppScore", `The ${team.name} score`);
@@ -1545,7 +1516,7 @@ function readForm() {
   };
   if (dialogMode === "complete" && editingUpcoming) body.fromUpcomingId = editingUpcoming.id;
 
-  return { kind: "game", passcode, body };
+  return { kind: "game", body };
 }
 
 async function submitDialog(event) {
@@ -1567,12 +1538,10 @@ async function submitDialog(event) {
 
   try {
     const path = parsed.kind === "upcoming" ? "/api/upcoming" : "/api/games";
-    await api("POST", path, parsed.body, parsed.passcode);
-    rememberPasscode(parsed.passcode);
+    await api("POST", path, parsed.body);
     closeDialog();
     await loadData();
   } catch (err) {
-    if (err.status === 401) forgetPasscode();
     showDialogError(err.message);
   } finally {
     saveBtn.disabled = false;
