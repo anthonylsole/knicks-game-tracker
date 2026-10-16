@@ -9,9 +9,7 @@
 //
 // Everything else is served from the static assets in /public (env.ASSETS).
 //
-// Reading is public. Every write (POST / DELETE) must send the passcode in an
-// "X-Passcode" header, which has to match the ADMIN_PASSCODE secret set on the
-// Worker in the Cloudflare dashboard.
+// There is no login: anyone who has the site's address can read and change the data.
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
@@ -54,29 +52,6 @@ export default {
 
 function json(body, status = 200) {
   return Response.json(body, { status });
-}
-
-// Compare two strings without bailing out at the first mismatch.
-function safeEqual(a, b) {
-  const enc = new TextEncoder();
-  const x = enc.encode(a);
-  const y = enc.encode(b);
-  let diff = x.length ^ y.length;
-  const len = Math.max(x.length, y.length);
-  for (let i = 0; i < len; i++) diff |= (x[i] || 0) ^ (y[i] || 0);
-  return diff === 0;
-}
-
-// Returns a Response when the request must be rejected, otherwise null.
-function checkPasscode(request, env) {
-  if (!env.ADMIN_PASSCODE) {
-    return json({ error: "No ADMIN_PASSCODE secret is set on the Worker yet, so saving is switched off." }, 503);
-  }
-  const given = request.headers.get("X-Passcode") || "";
-  if (!safeEqual(given, String(env.ADMIN_PASSCODE))) {
-    return json({ error: "Wrong passcode." }, 401);
-  }
-  return null;
 }
 
 async function readBody(request) {
@@ -192,9 +167,6 @@ async function listGames(env) {
 }
 
 async function addGame(request, env) {
-  const denied = checkPasscode(request, env);
-  if (denied) return denied;
-
   try {
     const body = await readBody(request);
     const matchup = readMatchup(body);
@@ -293,9 +265,6 @@ async function listUpcoming(env) {
 }
 
 async function addUpcoming(request, env) {
-  const denied = checkPasscode(request, env);
-  if (denied) return denied;
-
   try {
     const body = await readBody(request);
     const m = readMatchup(body);
@@ -314,9 +283,6 @@ async function addUpcoming(request, env) {
 }
 
 async function removeUpcoming(request, env, id) {
-  const denied = checkPasscode(request, env);
-  if (denied) return denied;
-
   await env.DB.prepare(`DELETE FROM upcoming_games WHERE id = ?`).bind(id).run();
   return json({ ok: true });
 }
