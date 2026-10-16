@@ -186,18 +186,19 @@
   .grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-auto-rows: 1fr;
     gap: 22px;
   }
 
   .card-slot {
     perspective: 1600px;
-    height: 340px;
+    display: flex;
   }
 
   .card {
     position: relative;
     width: 100%;
-    height: 100%;
+    display: flex;
     cursor: pointer;
     transform-style: preserve-3d;
     transition: transform 0.55s cubic-bezier(.4,.2,.2,1);
@@ -215,6 +216,15 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
+  }
+
+  /* The front sets the card's height (so nothing gets cut off); the grid makes
+     every card as tall as the tallest one. The back is laid over the front. */
+  .face.front {
+    position: relative;
+    inset: auto;
+    flex: 1;
+    min-height: 340px;
   }
 
   /* front */
@@ -323,6 +333,7 @@
   }
 
   .front .card-footer {
+    margin-top: auto;
     padding: 10px 18px;
     border-top: 1px solid rgba(255,255,255,0.08);
     text-align: right;
@@ -527,19 +538,6 @@
     color: #FFFFFF;
     white-space: nowrap;
   }
-
-  .sync-link {
-    font-family: 'Libre Franklin', sans-serif;
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    color: var(--orange);
-    text-decoration: underline;
-    margin-left: 8px;
-    vertical-align: middle;
-  }
-  .sync-link:hover { color: #FFFFFF; }
-  .sync-link.busy { opacity: 0.6; pointer-events: none; text-decoration: none; }
 
   .upcoming-when .up-countdown {
     margin-top: 5px;
@@ -1436,7 +1434,7 @@ async function loadData() {
 
 function countdownText(iso) {
   const n = daysUntil(iso);
-  if (n < 0) return "Played? Log the result";
+  if (n < 0) return "Played? Click SYNC";
   if (n === 0) return "Today";
   if (n === 1) return "Tomorrow";
   return `In ${n} days`;
@@ -1461,7 +1459,7 @@ function renderUpcoming() {
     return `
       <div class="upcoming-row" data-id="${esc(u.id)}">
         <div class="upcoming-when">
-          <div class="up-date">${esc(u.date)} <a href="#" class="sync-link" data-action="sync" data-id="${esc(u.id)}" title="Pull the final score and box score and make a card">SYNC</a></div>
+          <div class="up-date">${esc(u.date)}</div>
           <div class="up-countdown">${esc(weekdayOf(u.sortDate))} &middot; ${esc(countdownText(u.sortDate))}</div>
         </div>
         <div class="upcoming-matchup">
@@ -1476,7 +1474,7 @@ function renderUpcoming() {
           </div>
         </div>
         <div class="upcoming-actions">
-          <button type="button" class="btn btn-primary" data-action="complete" data-id="${esc(u.id)}">Log result</button>
+          <button type="button" class="btn btn-primary" data-action="sync" data-id="${esc(u.id)}" title="Pull the final score and box score and make a card">SYNC</button>
           <button type="button" class="btn btn-ghost" data-action="remove" data-id="${esc(u.id)}">Remove</button>
         </div>
       </div>
@@ -1485,15 +1483,15 @@ function renderUpcoming() {
 }
 
 async function syncGame(id, link) {
-  if (link.classList.contains("busy")) return;
-  link.classList.add("busy");
+  if (link.disabled) return;
+  link.disabled = true;
   link.textContent = "SYNCING...";
   try {
     await api("POST", `/api/upcoming/${id}/sync`);
     await loadData();
   } catch (err) {
     alert(err.message);
-    link.classList.remove("busy");
+    link.disabled = false;
     link.textContent = "SYNC";
   }
 }
@@ -1517,8 +1515,6 @@ const dlg = document.getElementById("gameDialog");
 const form = document.getElementById("gameForm");
 const el = id => document.getElementById(id);
 
-let dialogMode = "new";        // "new" or "complete"
-let editingUpcoming = null;    // the upcoming game being turned into a played game
 let venueEdited = false;       // true once the arena text was typed by hand
 
 function populateOpponents() {
@@ -1546,7 +1542,6 @@ function syncVenue() {
 }
 
 function needsResult() {
-  if (dialogMode === "complete") return true;
   const date = el("fDate").value;
   return Boolean(date) && date < todayISO();
 }
@@ -1559,8 +1554,7 @@ function syncDialogState() {
   el("fOppScoreLabel").textContent = team ? team.name : "Opponent";
 
   let label = "Add upcoming game";
-  if (dialogMode === "complete") label = "Save result";
-  else if (showResult) label = "Save game";
+  if (showResult) label = "Save game";
   el("dlgSave").textContent = label;
 
   syncPreview();
@@ -1594,9 +1588,7 @@ function clearDialogError() {
   el("dlgError").textContent = "";
 }
 
-function openDialog(mode, up) {
-  dialogMode = mode;
-  editingUpcoming = up || null;
+function openDialog() {
   clearDialogError();
 
   // Blank slate
@@ -1608,28 +1600,16 @@ function openDialog(mode, up) {
   el("fOpponent").value = "";
   venueEdited = false;
 
-  if (mode === "complete" && up) {
-    el("dlgTitle").textContent = "Log the result";
-    el("dlgSub").textContent = `${up.opponent} · ${up.date}. Enter the final score and box score to move it into The Games.`;
-    el("fDate").value = up.sortDate;
-    el("fHomeAway").value = up.location.startsWith("Away") ? "away" : "home";
-    const team = TEAMS.find(t => t.abbr === up.oppAbbr);
-    el("fOpponent").value = team ? team.abbr : "";
-    el("fCompetition").value = up.competition;
-    el("fVenue").value = up.venue;
-    venueEdited = true;
-  } else {
-    el("dlgTitle").textContent = "Add a game";
-    el("dlgSub").textContent = "A game dated today or later goes into the Upcoming banner. A game that's already been played needs its result.";
-    syncVenue();
-  }
+  el("dlgTitle").textContent = "Add a game";
+  el("dlgSub").textContent = "A game dated today or later goes into the Upcoming banner. A game that's already been played needs its result.";
+  syncVenue();
 
   syncDialogState();
 
   if (typeof dlg.showModal === "function") dlg.showModal();
   else dlg.setAttribute("open", "");
 
-  (mode === "complete" ? el("fKnicksScore") : el("fDate")).focus();
+  el("fDate").focus();
 }
 
 function closeDialog() {
@@ -1707,7 +1687,6 @@ function readForm() {
     leaders,
     recap: el("fRecap").value.trim()
   };
-  if (dialogMode === "complete" && editingUpcoming) body.fromUpcomingId = editingUpcoming.id;
 
   return { kind: "game", body };
 }
@@ -1786,10 +1765,7 @@ el("upcomingList").addEventListener("click", event => {
     syncGame(Number(btn.dataset.id), btn);
     return;
   }
-  if (btn.dataset.action === "complete") {
-    const u = upcoming.find(x => x.id === id);
-    if (u) openDialog("complete", u);
-  } else if (btn.dataset.action === "remove") {
+  if (btn.dataset.action === "remove") {
     removeUpcomingGame(id);
   }
 });
