@@ -3,6 +3,8 @@
 // Routes
 //   GET    /api/games            list attended games (newest first) with top performers
 //   POST   /api/games            add an attended game; pass fromUpcomingId to promote an upcoming game
+//   POST   /api/add-game         add a game from just a date: ESPN supplies the opponent, arena,
+//                                competition and (if it has been played) the score and box score
 //   POST   /api/games/:id/boxscore  fetch and store the full player box score from ESPN for a game
 //   GET    /api/upcoming         list upcoming games (soonest first)
 //   POST   /api/upcoming         add an upcoming game
@@ -26,6 +28,11 @@ export default {
         if (path === "/api/games") {
           if (request.method === "GET") return await listGames(env);
           if (request.method === "POST") return await addGame(request, env);
+          return json({ error: "Method not allowed" }, 405);
+        }
+
+        if (path === "/api/add-game") {
+          if (request.method === "POST") return await addByDate(request, env);
           return json({ error: "Method not allowed" }, 405);
         }
 
@@ -353,45 +360,119 @@ function buildBoxScore(summary) {
     });
     teams.push({
       abbr: t.team.abbreviation,
+      knicks: isKnicks(t.team),
       name: t.team.displayName || t.team.abbreviation,
       players,
       totals: pick(block.totals)
     });
   }
-  const ny = teams.findIndex(t => t.abbr === "NY");
+  const ny = teams.findIndex(t => t.knicks);
   if (ny < 0 || teams.length < 2) return null;
   if (ny > 0) teams.unshift(...teams.splice(ny, 1));
   return { columns: BOX_COLUMNS, teams };
 }
 
+function isKnicks(team) {
+  if (!team) return false;
+  return team.abbreviation === "NY" || team.abbreviation === "NYK" || String(team.id) === "18" ||
+    /knicks/i.test(String(team.displayName || team.name || ""));
+}
+
+// The calendar date (in New York, where ESPN schedules NBA days) a tip-off time falls on.
+function easternDate(iso) {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return null;
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).format(d);
+}
+
+function shiftDate(iso, days) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return new Date(Date.UTC(y, m - 1, d + days)).toISOString().slice(0, 10);
+}
+
+// Finds the Knicks game on a date in ESPN's schedule (played or not). ESPN sometimes files a
+// night game under the neighbouring day, so the days either side are checked too, and a game
+// only counts when its tip-off is on the requested date in New York.
+async function findKnicksEvent(sortDate, label) {
+  let listedOnDay = null;
+  for (const day of [sortDate, shiftDate(sortDate, 1), shiftDate(sortDate, -1)]) {
+    const board = await espn(`/scoreboard?dates=${day.replace(/-/g, "")}`);
+    const events = board.events || [];
+    if (day === sortDate) listedOnDay = events.length;
+    const event = events.find(e =>
+      (((e.competitions || [])[0] || {}).competitors || []).some(c => isKnicks(c.team)) &&
+      (!e.date || easternDate(e.date) === null || easternDate(e.date) === sortDate)
+    );
+    if (!event) continue;
+
+    const comp = event.competitions[0];
+    const ny = comp.competitors.find(c => isKnicks(c.team));
+    const opp = comp.competitors.find(c => !isKnicks(c.team));
+    const status = (event.status && event.status.type) || {};
+    return { event, comp, ny, opp, status };
+  }
+  throw new HttpError(`ESPN shows no Knicks game on ${label}. (ESPN listed ${listedOnDay === null ? 0 : listedOnDay} NBA game${listedOnDay === 1 ? "" : "s"} for that day.)`, 404);
+}
+
+function clip(value, max) {
+  return String(value || "").trim().slice(0, max);
+}
+
+function competitionLabel(event, comp) {
+  const note = (((event.notes || [])[0]) || ((comp.notes || [])[0]) || {}).headline || "";
+  const clean = String(note).replace(/\s+-\s+/g, " \u2014 ").trim();
+  const season = event.season || {};
+  const type = Number(season.type);
+  const slug = String(season.slug || "");
+  if (type === 5 || /play-?in/i.test(slug)) return clean ? `NBA Play-In, ${clean}` : "NBA Play-In";
+  if (type === 3 || /post/i.test(slug)) return clean ? `NBA Playoffs, ${clean}` : "NBA Playoffs";
+  if (type === 1 || /pre/i.test(slug)) return "Preseason";
+  return clean ? `Regular Season \u2014 ${clean}` : "Regular Season";
+}
+
+// Everything the cards and banner need about a game, taken from ESPN's schedule entry.
+function matchupFromEvent(found, sortDate) {
+  const { event, comp, ny, opp } = found;
+  const t = opp.team;
+  const home = ny.homeAway === "home";
+  const opponent = clip(t.displayName || `${t.location || ""} ${t.name || ""}`, 60);
+  const v = comp.venue || {};
+  const city = (v.address || {}).city || "";
+  const state = (v.address || {}).state || "";
+  const arena = clip(v.fullName || (home ? "Madison Square Garden" : `${opponent} arena`), 80);
+  return {
+    sortDate,
+    date: displayDate(sortDate),
+    opponent,
+    oppAbbr: clip(t.abbreviation, 4).toUpperCase(),
+    oppColor: color(t.color ? `#${String(t.color).replace("#", "")}` : ""),
+    location: clip(home ? `Home \u2014 ${arena}` : `Away \u2014 ${arena}${city ? `, ${city}` : ""}`, 120),
+    venue: clip([arena, city, state].filter(Boolean).join(", "), 120),
+    competition: clip(competitionLabel(event, comp), 120)
+  };
+}
+
 // Looks up the finished Knicks game on a date. Throws a friendly error when it isn't available.
 async function findFinalGame(sortDate, label) {
-  const board = await espn(`/scoreboard?dates=${sortDate.replace(/-/g, "")}`);
-  const event = (board.events || []).find(e =>
-    (((e.competitions || [])[0] || {}).competitors || []).some(c => c.team && c.team.abbreviation === "NY")
-  );
-  if (!event) throw new HttpError(`ESPN has no Knicks game on ${label}.`, 404);
-
-  const comp = event.competitions[0];
-  const ny = comp.competitors.find(c => c.team.abbreviation === "NY");
-  const opp = comp.competitors.find(c => c.team.abbreviation !== "NY");
-  const status = (event.status && event.status.type) || {};
-  if (!status.completed) {
-    throw new HttpError(`That game isn't final yet (${status.shortDetail || status.description || "not started"}). Try again after it ends.`, 409);
+  const found = await findKnicksEvent(sortDate, label);
+  if (!found.status.completed) {
+    throw new HttpError(`That game isn't final yet (${found.status.shortDetail || found.status.description || "not started"}). Try again after it ends.`, 409);
   }
+  return finalDetails(found);
+}
 
-  const knicksScore = Number(ny.score);
-  const oppScore = Number(opp.score);
+async function finalDetails(found) {
+  const knicksScore = Number(found.ny.score);
+  const oppScore = Number(found.opp.score);
   if (!Number.isInteger(knicksScore) || !Number.isInteger(oppScore) || knicksScore === oppScore) {
     throw new HttpError("ESPN returned an unusable final score.", 502);
   }
-
-  const summary = await espn(`/summary?event=${event.id}`);
+  const summary = await espn(`/summary?event=${found.event.id}`);
   return { knicksScore, oppScore, summary };
 }
 
 function knicksLeaders(summary) {
-  const entry = (summary.leaders || []).find(l => l.team && l.team.abbreviation === "NY");
+  const entry = (summary.leaders || []).find(l => l.team && isKnicks(l.team));
   if (!entry) return [];
   const labels = { points: "pts", rebounds: "reb", assists: "ast" };
   const order = [];
@@ -409,15 +490,14 @@ function knicksLeaders(summary) {
   return order.map(name => ({ name, stat: byName[name].join(", ") }));
 }
 
-/* ---------- sync an upcoming game ---------- */
+/* ---------- save a played game ---------- */
 
-async function syncUpcoming(env, id) {
-  const row = await env.DB.prepare(`SELECT * FROM upcoming_games WHERE id = ?`).bind(id).first();
-  if (!row) throw new HttpError("That upcoming game isn't in the list anymore.", 404);
+// Inserts a finished game with its box score and top performers. When fromUpcomingId is
+// given, that upcoming row is removed in the same transaction as the leaders.
+async function savePlayedGame(env, m, details, fromUpcomingId) {
+  const { knicksScore, oppScore, summary } = details;
 
-  const { knicksScore, oppScore, summary } = await findFinalGame(row.sort_date, row.game_date);
-
-  const team = ((summary.boxscore || {}).teams || []).find(t => t.team && t.team.abbreviation === "NY");
+  const team = ((summary.boxscore || {}).teams || []).find(t => t.team && isKnicks(t.team));
   if (!team) throw new HttpError("ESPN's box score isn't available yet. Try again in a few minutes.", 502);
 
   const [fgm, fga] = madeAtt(team, "fieldGoalsMade-fieldGoalsAttempted");
@@ -429,7 +509,7 @@ async function syncUpcoming(env, id) {
 
   const box = buildBoxScore(summary);
   const result = knicksScore > oppScore ? "W" : "L";
-  const recap = `Knicks ${result === "W" ? "won" : "lost"} ${knicksScore}-${oppScore} ${row.location.startsWith("Away") ? "at" : "against"} the ${row.opponent}. Box score synced automatically.`;
+  const recap = `Knicks ${result === "W" ? "won" : "lost"} ${knicksScore}-${oppScore} ${m.location.startsWith("Away") ? "at" : "against"} the ${m.opponent}. Box score synced automatically.`;
 
   const insert = await env.DB.prepare(
     `INSERT INTO games
@@ -437,8 +517,8 @@ async function syncUpcoming(env, id) {
        competition, result, knicks_score, opp_score, reb, ast, fgm, fga, tpm, tpa, ftm, fta, recap, box_json)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
-    row.game_date, row.sort_date, row.opponent, row.opp_abbr, row.opp_color,
-    row.location, row.venue, row.competition, result, knicksScore, oppScore,
+    m.date, m.sortDate, m.opponent, m.oppAbbr, m.oppColor,
+    m.location, m.venue, m.competition, result, knicksScore, oppScore,
     reb, ast, fgm, fga, tpm, tpa, ftm, fta, recap, box ? JSON.stringify(box) : null
   ).run();
   const gameId = insert.meta.last_row_id;
@@ -447,10 +527,55 @@ async function syncUpcoming(env, id) {
     env.DB.prepare(`INSERT INTO leaders (game_id, name, stat, sort_order) VALUES (?, ?, ?, ?)`)
       .bind(gameId, l.name, l.stat, i)
   );
-  followUps.push(env.DB.prepare(`DELETE FROM upcoming_games WHERE id = ?`).bind(id));
-  await env.DB.batch(followUps);
+  if (fromUpcomingId) {
+    followUps.push(env.DB.prepare(`DELETE FROM upcoming_games WHERE id = ?`).bind(fromUpcomingId));
+  }
+  if (followUps.length) await env.DB.batch(followUps);
 
-  return json({ id: gameId, result, knicksScore, oppScore }, 201);
+  return { id: gameId, result, knicksScore, oppScore };
+}
+
+/* ---------- sync an upcoming game ---------- */
+
+async function syncUpcoming(env, id) {
+  const row = await env.DB.prepare(`SELECT * FROM upcoming_games WHERE id = ?`).bind(id).first();
+  if (!row) throw new HttpError("That upcoming game isn't in the list anymore.", 404);
+
+  const details = await findFinalGame(row.sort_date, row.game_date);
+  const m = {
+    sortDate: row.sort_date, date: row.game_date, opponent: row.opponent, oppAbbr: row.opp_abbr,
+    oppColor: row.opp_color, location: row.location, venue: row.venue, competition: row.competition
+  };
+  return json(await savePlayedGame(env, m, details, id), 201);
+}
+
+/* ---------- add a game from just a date ---------- */
+
+async function addByDate(request, env) {
+  const body = await readBody(request);
+  const sortDate = isoDate(body.sortDate);
+  const label = displayDate(sortDate);
+
+  const dupGame = await env.DB.prepare(`SELECT id FROM games WHERE sort_date = ?`).bind(sortDate).first();
+  const dupUp = await env.DB.prepare(`SELECT id FROM upcoming_games WHERE sort_date = ?`).bind(sortDate).first();
+  if (dupGame || dupUp) throw new HttpError(`The ${label} game is already on the page.`, 409);
+
+  const found = await findKnicksEvent(sortDate, label);
+  const m = matchupFromEvent(found, sortDate);
+  if (!m.opponent || !m.oppAbbr) throw new HttpError("ESPN's schedule entry is missing the opponent.", 502);
+
+  if (found.status.completed) {
+    const details = await finalDetails(found);
+    const saved = await savePlayedGame(env, m, details, null);
+    return json({ kind: "played", opponent: m.opponent, ...saved }, 201);
+  }
+
+  const insert = await env.DB.prepare(
+    `INSERT INTO upcoming_games
+      (game_date, sort_date, opponent, opp_abbr, opp_color, location, venue, competition)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(m.date, m.sortDate, m.opponent, m.oppAbbr, m.oppColor, m.location, m.venue, m.competition).run();
+  return json({ kind: "upcoming", opponent: m.opponent, id: insert.meta.last_row_id }, 201);
 }
 
 /* ---------- load a box score for a game that's already a card ---------- */
